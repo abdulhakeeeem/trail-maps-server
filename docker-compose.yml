@@ -14,6 +14,17 @@ services:
     expose:
       - "8080"
 
+  # Serves the map style (/style.json). The app's offline downloader needs it at a web address.
+  # In Coolify give this service the domain http://YOUR-DOMAIN with the path /style.json on port 80.
+  style:
+    build:
+      context: ./style
+    restart: unless-stopped
+    mem_limit: 64m
+    cpus: 0.25
+    expose:
+      - "80"
+
   builder:
     build:
       context: .
