@@ -19,8 +19,9 @@ imagery builds for a small area, serving real tiles). A full-size build has not 
 
 ## What is in the folder
 
-- `docker-compose.yml`: two services. `tiles` serves the files. `builder` makes them, and sits idle until you start a job.
+- `docker-compose.yml`: three services. `tiles` serves the map files. `style` serves the map style (`/style.json`). `builder` makes the files, and sits idle until you start a job.
 - `Dockerfile.builder`: the builder image (Python, the pmtiles tool, Sentinel-2 libraries).
+- `style/`: the map style file and the small web server that serves it. The file is generated from the app's own style code; a unit test keeps the two identical.
 - `scripts/build_roads.sh`: cuts your area out of the newest Protomaps OpenStreetMap build (minutes).
 - `scripts/build_imagery.sh` / `build_imagery.py`: builds the satellite map (hours).
 - `scripts/area.sh`: the areas. `AREA=start` is about 200 km x 190 km around your first desert trips.
@@ -49,7 +50,10 @@ If the repository is private, Coolify needs a deploy key or a GitHub App to read
 2. Pick the repository and branch. Set **Build Pack** to **Docker Compose**. Leave the Compose location as `/docker-compose.yml`.
 3. In the resource's settings, give the **`tiles`** service a domain such as `https://maps.example.com`
    (port 8080). Create a DNS record for that name pointing at the server, or ask whoever manages the domain.
-4. Press **Deploy**. Both services should show as running.
+   Also give the **`style`** service the same host with the path `/style.json` (port 80). The app's offline
+   downloader needs the map style at a web address, and this tiny service serves it.
+   (Coolify removes the path before passing the request on, so the service answers at both `/` and `/style.json`.)
+4. Press **Deploy**. All three services should show as running.
 
 ## Step 3: build the maps
 
