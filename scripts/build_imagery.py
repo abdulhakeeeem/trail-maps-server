@@ -272,6 +272,15 @@ def owned_tiles(cell, z, strict, clip):
     return tiles
 
 
+def scenes_over_tiles(scenes, tiles, z):
+    """Keeps only the scenes that cover at least one of the tiles (saves downloading scenes that are only over the sea)."""
+    boxes = [tile_lonlat_bounds(x, y, z) for x, y in tiles]
+    return [
+        s for s in scenes
+        if any(not (s.bbox[2] < w or s.bbox[0] > e or s.bbox[3] < so or s.bbox[1] > n) for w, so, e, n in boxes)
+    ]
+
+
 def download_with_retry(href, cache, tries=4):
     for attempt in range(1, tries + 1):
         try:
@@ -364,6 +373,7 @@ def main():
             print("  warning: no cloud-free scenes here; this block is skipped for now", flush=True)
             skipped.append(name)
             continue
+        scenes = scenes_over_tiles(scenes, top_tiles, maxz)
         print(f"Using {len(scenes)} scenes", flush=True)
         if len(scenes) > 60 and not args.yes and not args.remote and not chunked:
             sys.exit("That needs many downloads (about 300 MB per scene). Use a smaller AREA, add --chunk-deg 3, or add --yes.")
