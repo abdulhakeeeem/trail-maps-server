@@ -73,12 +73,13 @@ The `tiles` service finds new files by itself. There is no need to restart it.
 
 ## Step 4: check it
 
-Open these in a browser (use your own domain):
+Open these in a browser (use your own domain). Tile numbers must be real ones for your area:
 
-- `https://maps.example.com/roads.json` and `https://maps.example.com/imagery.json` should show information about each file.
-- Open a tile address from the table above, with real numbers (for example `/imagery/10/646/437.jpg`). It should return a picture.
+- A roads tile, for example `https://maps.example.com/roads/14/10362/7006.mvt`, should download a small file (not "Archive not found").
+- A satellite tile, for example `https://maps.example.com/imagery/14/10362/7006.jpg`, should show a picture once the imagery build has finished.
+- The information pages `/roads.json` and `/imagery.json` only work if you add `--public-url=https://maps.example.com` to the `tiles` command in `docker-compose.yml`. The app does not need them.
 
-Then send me the address. I will switch the app to it (see "What still has to change in the app" below).
+Then put the address in `secrets.properties` as described under "Pointing the app at your server" below.
 
 ## Colours
 
