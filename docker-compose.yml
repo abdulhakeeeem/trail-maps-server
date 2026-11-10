@@ -1,0 +1,32 @@
+# Trail Log map server: serves the map files, and holds a builder that makes them.
+# Deploy in Coolify as a "Docker Compose" resource (see README.md).
+
+services:
+  tiles:
+    image: protomaps/go-pmtiles:latest
+    # Serves /data/roads.pmtiles at /roads/{z}/{x}/{y}.mvt and /data/imagery.pmtiles at /imagery/{z}/{x}/{y}.jpg
+    command: ["serve", "/data", "--port=8080", "--cors=*", "--cache-size=256"]
+    volumes:
+      - mapdata:/data:ro
+    restart: unless-stopped
+    mem_limit: 512m
+    cpus: 1.0
+    expose:
+      - "8080"
+
+  builder:
+    build:
+      context: .
+      dockerfile: Dockerfile.builder
+    # Idle until you open its terminal and start a build, so it uses almost nothing.
+    volumes:
+      - mapdata:/data
+      - mapwork:/work
+    restart: unless-stopped
+    # Be polite on a shared server.
+    mem_limit: 4g
+    cpus: 2.0
+
+volumes:
+  mapdata:
+  mapwork:
