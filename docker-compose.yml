@@ -35,8 +35,8 @@ services:
       - mapwork:/work
     restart: unless-stopped
     # Be polite on a shared server.
-    mem_limit: 4g
-    cpus: 2.0
+    mem_limit: 8g
+    cpus: 6.0
 
 volumes:
   mapdata:

@@ -25,7 +25,7 @@ imagery builds for a small area, serving real tiles). A full-size build has not 
 - `scripts/build_roads.sh`: cuts your area out of the newest Protomaps OpenStreetMap build (minutes).
 - `scripts/build_imagery.sh` / `build_imagery.py`: builds the satellite map (hours).
 - `scripts/area.sh`: the areas. `AREA=start` is about 200 km x 190 km around your first desert trips.
-  `central` is Riyadh to the Eastern Province. `ksa` is the whole country (roads only for now).
+  `central` is Riyadh to the Eastern Province. `ksa` is the whole country.
   Or set your own: `BBOX=minLon,minLat,maxLon,maxLat`.
 
 ## Before you start
@@ -35,8 +35,8 @@ imagery builds for a small area, serving real tiles). A full-size build has not 
 2. **HTTPS.** The app needs an `https` address. Coolify creates the certificate for you once a public domain points at the server.
 3. **Disk space.** Check with `df -h` in the Coolify terminal. Plan for:
    - `start` area: about 1 GB of finished maps plus 8 to 10 GB of temporary downloads while building.
-   - Bigger areas need proportionally more. Do not start `ksa` imagery without asking first.
-4. **The server is shared.** Tell its owner. The builder is limited to 2 CPUs and 4 GB of memory in `docker-compose.yml`.
+   - Bigger areas need proportionally more. `ksa` imagery needs about 150 GB free (see "Whole of Saudi Arabia").
+4. **The server is shared.** Tell its owner. The builder is limited to 6 CPUs and 8 GB of memory in `docker-compose.yml`.
 
 ## Step 1: get this folder into a Git repository
 
@@ -96,6 +96,24 @@ python /app/build_imagery.py --bbox 47.685,25.185,47.695,25.195 --remote --previ
 ```
 
 The defaults are those values. Lower `--white` or raise `--gamma` for a brighter picture. Lower `--saturation` for calmer colours.
+
+## Whole of Saudi Arabia (plain 10 m map)
+
+`AREA=ksa` builds the whole country, clipped to its outline (the sea and the neighbouring countries are left out):
+about 430,000 tiles at zoom 14. The build works in blocks of 3 degrees, so only one block of Sentinel-2 scenes is on disk
+at a time, and if it stops (restart, power cut) you start the same command again and it continues where it left off.
+
+1. **Disk.** Expect roughly 30 to 55 GB for the finished file, plus the same again while building, plus about 20 GB of scenes.
+   Have about 150 GB free (`df -h` in the Coolify terminal). This is an estimate: the first blocks will show the real size.
+2. In the **builder** terminal:
+   ```
+   AREA=ksa nohup /app/build_imagery.sh --chunk-deg 3 --workers 6 > /work/imagery_ksa.log 2>&1 &
+   tail -f /work/imagery_ksa.log
+   ```
+   It takes about a day or two. The map file in `/data` is only replaced at the very end, so the running map keeps working.
+3. If some blocks could not be downloaded (the log says "skipped"), nothing is written yet. Run the same command again
+   to retry just those blocks.
+4. To start over from nothing, delete `/work/tiles.sqlite` first.
 
 ## Keeping it fresh
 
