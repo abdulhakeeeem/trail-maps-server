@@ -115,6 +115,26 @@ at a time, and if it stops (restart, power cut) you start the same command again
    to retry just those blocks.
 4. To start over from nothing, delete `/work/tiles.sqlite` first.
 
+## Live location sharing
+
+The `live` service lets friends in one group see each other's position and route in the app. There is no web page:
+the map is only in the app. No accounts: a group is a long random link the app makes and the user sends by WhatsApp.
+
+1. In Coolify give the **`live`** service the same domain as the maps with the path `/live` (port 8090), and a
+   second entry for the path `/.well-known/assetlinks.json`. Android checks that file so group links open the app
+   instead of the browser. Put the release signing key in `ASSETLINKS` in `docker-compose.yml` before publishing.
+2. Check it: `https://YOUR-DOMAIN/live/health` should answer `{"ok":true}`.
+3. Opening a group link in a browser (someone without the app) sends them to the app on Google Play.
+   Set `PLAY_URL` in `docker-compose.yml` once the app id is final.
+
+What it keeps: each phone's name, its positions while sharing, and when it last sent. Everything about a phone is
+deleted 24 hours after it last sent anything. There is no access log. A group holds up to 20 phones, and each phone
+keeps at most its newest 20,000 points.
+
+The server holds people's locations while they share. Tell the server's owner.
+
+Test it on a PC (Python 3.10 or newer, no extra libraries): `cd live` then `python -m unittest test_live`.
+
 ## Keeping it fresh
 
 Run the imagery build again once or twice a year. It uses the clearest scenes of the last 365 days.

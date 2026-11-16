@@ -25,6 +25,25 @@ services:
     expose:
       - "80"
 
+  # Live location sharing between friends (see README.md, "Live location sharing").
+  # In Coolify give this service the same domain with the path /live on port 8090.
+  live:
+    build:
+      context: ./live
+    environment:
+      # Where someone without the app lands when they tap a group link. Change it once the app id is final.
+      - PLAY_URL=https://play.google.com/store/apps/details?id=com.aljarra.app
+      # Lets group links open the app directly (Android App Links). Served at /.well-known/assetlinks.json.
+      # This is the test (debug) signing key and today's app id; add the release key and the final app id before publishing.
+      - 'ASSETLINKS=[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"com.traillog.personal","sha256_cert_fingerprints":["40:69:9B:76:CA:54:E0:09:41:08:A3:EF:26:99:9C:4A:A4:58:1D:A4:E2:B1:DE:65:62:9B:49:F6:48:D0:48:A8"]}}]'
+    volumes:
+      - livedata:/livedata
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.5
+    expose:
+      - "8090"
+
   builder:
     build:
       context: .
@@ -41,3 +60,4 @@ services:
 volumes:
   mapdata:
   mapwork:
+  livedata:
