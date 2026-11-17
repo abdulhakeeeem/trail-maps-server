@@ -166,7 +166,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         parts, query = self._parts()
-        if parts == [".well-known", "assetlinks.json"] and ASSETLINKS:
+        # Coolify strips the route path, so /.well-known/assetlinks.json may arrive here as "/".
+        if parts in ([], [".well-known", "assetlinks.json"]) and ASSETLINKS:
             data = ASSETLINKS.encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")

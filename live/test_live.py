@@ -79,6 +79,17 @@ class LiveTest(unittest.TestCase):
         self.assertEqual(302, status)
         self.assertEqual(live.PLAY_URL, response.getheader("Location"))
 
+    def test_app_link_file_is_served_with_or_without_the_route_path(self):
+        old = live.ASSETLINKS
+        live.ASSETLINKS = '[{"relation":["x"]}]'
+        try:
+            for path in ("/.well-known/assetlinks.json", "/"):
+                status, body, _ = self.call("GET", path)
+                self.assertEqual(200, status)
+                self.assertEqual([{"relation": ["x"]}], body)
+        finally:
+            live.ASSETLINKS = old
+
     def test_data_is_deleted_a_day_after_the_last_update(self):
         store = live.Store(":memory:")
         now = live.now_ms()
