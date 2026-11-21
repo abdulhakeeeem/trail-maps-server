@@ -34,8 +34,8 @@ services:
       # Where someone without the app lands when they tap a group link. Change it once the app id is final.
       - PLAY_URL=https://play.google.com/store/apps/details?id=com.aljarra.app
       # Lets group links open the app directly (Android App Links). Served at /.well-known/assetlinks.json.
-      # This is the test (debug) signing key and today's app id; add the release key and the final app id before publishing.
-      - 'ASSETLINKS=[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"com.traillog.personal","sha256_cert_fingerprints":["40:69:9B:76:CA:54:E0:09:41:08:A3:EF:26:99:9C:4A:A4:58:1D:A4:E2:B1:DE:65:62:9B:49:F6:48:D0:48:A8"]}}]'
+      # Debug key + upload key for com.aljarra.app. After the first Play upload, add the Play App Signing SHA-256 too.
+      - 'ASSETLINKS=[{"relation":["delegate_permission/common.handle_all_urls"],"target":{"namespace":"android_app","package_name":"com.aljarra.app","sha256_cert_fingerprints":["40:69:9B:76:CA:54:E0:09:41:08:A3:EF:26:99:9C:4A:A4:58:1D:A4:E2:B1:DE:65:62:9B:49:F6:48:D0:48:A8","A1:C5:38:C6:65:D3:11:68:22:17:B7:5B:D8:9A:06:E0:BE:ED:66:F8:53:8A:C2:50:52:A9:B8:CA:D9:7C:46:36"]}}]'
     volumes:
       - livedata:/livedata
     restart: unless-stopped

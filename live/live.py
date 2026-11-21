@@ -22,6 +22,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 DB_PATH = os.environ.get("LIVE_DB", "/livedata/live.sqlite")
+# The app's privacy policy (Google Play needs a public link): https://<host>/live/privacy
+_PRIVACY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "privacy.html")
+PRIVACY = open(_PRIVACY_FILE, encoding="utf-8").read() if os.path.exists(_PRIVACY_FILE) else "Privacy policy unavailable."
 PLAY_URL = os.environ.get("PLAY_URL", "https://play.google.com/store/apps/details?id=com.aljarra.app")
 ASSETLINKS = os.environ.get("ASSETLINKS", "")  # Android App Links file, so links open the app directly
 KEEP_MS = 24 * 3600 * 1000
@@ -177,6 +180,14 @@ class Handler(BaseHTTPRequestHandler):
             return
         if parts == ["health"]:
             return self._json(200, {"ok": True})
+        if parts == ["privacy"]:
+            data = PRIVACY.encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+            return
         if len(parts) == 2 and parts[1] == "data" and ID.match(parts[0]):
             try:
                 after = int(query.get("after", ["0"])[0])

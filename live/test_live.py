@@ -79,6 +79,12 @@ class LiveTest(unittest.TestCase):
         self.assertEqual(302, status)
         self.assertEqual(live.PLAY_URL, response.getheader("Location"))
 
+    def test_privacy_page_is_public_html_with_or_without_the_route_path(self):
+        for path in ("/live/privacy", "/privacy"):
+            status, _, response = self.call("GET", path)
+            self.assertEqual(200, status)
+            self.assertIn("text/html", response.getheader("Content-Type"))
+
     def test_app_link_file_is_served_with_or_without_the_route_path(self):
         old = live.ASSETLINKS
         live.ASSETLINKS = '[{"relation":["x"]}]'
